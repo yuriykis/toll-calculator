@@ -26,6 +26,7 @@ func genCoord() float64 {
 func main() {
 	obuIDs := generateOBUIDS(20)
 	conn, _, err := websocket.DefaultDialer.Dial(wsEndpoint, nil)
+	//defer conn.Close()
 
 	if err != nil {
 		log.Fatal(err)

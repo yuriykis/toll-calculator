@@ -10,7 +10,11 @@ import (
 )
 
 func main() {
-	recv := NewDataReceiver()
+
+	recv, err := NewDataReceiver()
+	if err != nil {
+		log.Fatal(err)
+	}
 	http.HandleFunc("/ws", recv.handleWS)
 	http.ListenAndServe(":30000", nil)
 }
@@ -18,12 +22,24 @@ func main() {
 type DataReceiver struct {
 	msgch chan types.OBUData
 	conn  *websocket.Conn
+	prod  DataProducer
 }
 
-func NewDataReceiver() *DataReceiver {
+func NewDataReceiver() (*DataReceiver, error) {
+	var (
+		p          DataProducer
+		err        error
+		kafkaTopic = "obu-data"
+	)
+	p, err = NewKafkaProducer(kafkaTopic)
+	if err != nil {
+		return nil, err
+	}
+	p = NewLogModdleware(p)
 	return &DataReceiver{
 		msgch: make(chan types.OBUData, 128),
-	}
+		prod:  p,
+	}, nil
 }
 
 func (dr *DataReceiver) handleWS(w http.ResponseWriter, r *http.Request) {
@@ -32,11 +48,17 @@ func (dr *DataReceiver) handleWS(w http.ResponseWriter, r *http.Request) {
 		WriteBufferSize: 1024,
 	}
 	conn, err := u.Upgrade(w, r, nil)
+	//defer conn.Close()
+
 	if err != nil {
 		log.Fatal(err)
 	}
 	dr.conn = conn
 	go dr.wsReceiveLoop()
+}
+
+func (dr *DataReceiver) produceData(data types.OBUData) error {
+	return dr.prod.ProduceData(data)
 }
 
 func (dr *DataReceiver) wsReceiveLoop() {
@@ -47,7 +69,8 @@ func (dr *DataReceiver) wsReceiveLoop() {
 			log.Println(err)
 			continue
 		}
-		fmt.Printf("Received data from OBU: [%d] :: <lat %.2f, long %.2f>\n", data.OBUID, data.Lat, data.Long)
-		dr.msgch <- data
+		if err := dr.produceData(data); err != nil {
+			log.Println(err)
+		}
 	}
 }
