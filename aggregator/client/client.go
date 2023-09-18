@@ -19,12 +19,16 @@ func NewClient(endpoint string) *Client {
 	}
 }
 
-func (c *Client) AggreagteInvoice(distance types.Distance) error {
+func (c *Client) AggregateInvoice(distance types.Distance) error {
 	b, err := json.Marshal(distance)
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequest(http.MethodPost, c.Endpoint+"/aggregate", bytes.NewReader(b))
+	req, err := http.NewRequest(
+		http.MethodPost,
+		c.Endpoint+"/aggregate",
+		bytes.NewReader(b),
+	)
 	if err != nil {
 		return err
 	}
