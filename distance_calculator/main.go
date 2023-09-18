@@ -10,6 +10,7 @@ func main() {
 		svc CalculatorServicer
 	)
 	svc = NewCalculatorService()
+	svc = NewLogModdleware(svc)
 	kafkaConsumer, err := NewKafkaConsumer(kafkaTopic, svc)
 	if err != nil {
 		logrus.Fatal(err)

@@ -49,7 +49,6 @@ func (dr *DataReceiver) handleWS(w http.ResponseWriter, r *http.Request) {
 	}
 	conn, err := u.Upgrade(w, r, nil)
 	//defer conn.Close()
-
 	if err != nil {
 		log.Fatal(err)
 	}

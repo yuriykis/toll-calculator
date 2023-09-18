@@ -12,7 +12,7 @@ import (
 
 const wsEndpoint = "ws://localhost:30000/ws"
 
-var sendInterval = time.Second
+var sendInterval = time.Second * 10
 
 func genLatLong() (float64, float64) {
 	return genCoord(), genCoord()
@@ -27,11 +27,9 @@ func main() {
 	obuIDs := generateOBUIDS(20)
 	conn, _, err := websocket.DefaultDialer.Dial(wsEndpoint, nil)
 	//defer conn.Close()
-
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	for {
 		for i := 0; i < len(obuIDs); i++ {
 			lat, long := genLatLong()
@@ -44,7 +42,7 @@ func main() {
 				log.Fatal(err)
 			}
 		}
-		time.Sleep(sendInterval * 5)
+		time.Sleep(sendInterval)
 	}
 }
 
