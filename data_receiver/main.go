@@ -35,7 +35,7 @@ func NewDataReceiver() (*DataReceiver, error) {
 	if err != nil {
 		return nil, err
 	}
-	p = NewLogModdleware(p)
+	p = NewLogMiddleware(p)
 	return &DataReceiver{
 		msgch: make(chan types.OBUData, 128),
 		prod:  p,

@@ -7,17 +7,19 @@ import (
 	"github.com/yuriykis/tolling/types"
 )
 
-type LogModdleware struct {
+type LogMiddleware struct {
 	next CalculatorServicer
 }
 
-func NewLogModdleware(next CalculatorServicer) CalculatorServicer {
-	return &LogModdleware{
+func NewLogMiddleware(next CalculatorServicer) CalculatorServicer {
+	return &LogMiddleware{
 		next: next,
 	}
 }
 
-func (lm *LogModdleware) CalculateDistance(data types.OBUData) (dist float64, err error) {
+func (lm *LogMiddleware) CalculateDistance(
+	data types.OBUData,
+) (dist float64, err error) {
 	defer func(start time.Time) {
 		logrus.WithFields(logrus.Fields{
 			"took": time.Since(start),

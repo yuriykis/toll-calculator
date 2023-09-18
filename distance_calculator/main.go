@@ -16,7 +16,7 @@ func main() {
 		svc CalculatorServicer
 	)
 	svc = NewCalculatorService()
-	svc = NewLogModdleware(svc)
+	svc = NewLogMiddleware(svc)
 
 	kafkaConsumer, err := NewKafkaConsumer(
 		kafkaTopic,

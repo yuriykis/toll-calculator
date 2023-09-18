@@ -7,17 +7,17 @@ import (
 	"github.com/yuriykis/tolling/types"
 )
 
-type LogModdleware struct {
+type LogMiddleware struct {
 	next DataProducer
 }
 
-func NewLogModdleware(next DataProducer) *LogModdleware {
-	return &LogModdleware{
+func NewLogMiddleware(next DataProducer) *LogMiddleware {
+	return &LogMiddleware{
 		next: next,
 	}
 }
 
-func (lm *LogModdleware) ProduceData(data types.OBUData) error {
+func (lm *LogMiddleware) ProduceData(data types.OBUData) error {
 	defer func(start time.Time) {
 		logrus.WithFields(logrus.Fields{
 			"obuID": data.OBUID,
