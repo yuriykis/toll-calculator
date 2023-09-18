@@ -19,4 +19,4 @@ aggregator:
 	@go build -o bin/$(AGGREAGTOR_BINARY_NAME) ./aggregator
 	@./bin/$(AGGREAGTOR_BINARY_NAME)
 
-.PHONY: obu, aggregator
+.PHONY: obu aggregator
