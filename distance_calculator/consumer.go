@@ -11,16 +11,16 @@ import (
 )
 
 type KafkaConsumer struct {
-	consumer    *kafka.Consumer
-	ifRunning   bool
-	calcService CalculatorServicer
-	aggClient   *client.Client
+	consumer      *kafka.Consumer
+	ifRunning     bool
+	calcService   CalculatorServicer
+	aggHTTPClient *client.HTTPClient
 }
 
 func NewKafkaConsumer(
 	topic string,
 	svc CalculatorServicer,
-	aggClient *client.Client,
+	aggHTTPClient *client.HTTPClient,
 ) (*KafkaConsumer, error) {
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers": "localhost",
@@ -34,9 +34,9 @@ func NewKafkaConsumer(
 	c.SubscribeTopics([]string{topic}, nil)
 
 	return &KafkaConsumer{
-		consumer:    c,
-		calcService: svc,
-		aggClient:   aggClient,
+		consumer:      c,
+		calcService:   svc,
+		aggHTTPClient: aggHTTPClient,
 	}, nil
 }
 
@@ -68,7 +68,7 @@ func (c *KafkaConsumer) readMessageLoop() {
 			Value: distance,
 			Unix:  time.Now().Unix(),
 		}
-		if err := c.aggClient.AggregateInvoice(req); err != nil {
+		if err := c.aggHTTPClient.AggregateInvoice(req); err != nil {
 			logrus.Errorf("Error aggregating invoice: %v", err)
 			continue
 		}

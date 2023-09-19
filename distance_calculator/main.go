@@ -21,7 +21,7 @@ func main() {
 	kafkaConsumer, err := NewKafkaConsumer(
 		kafkaTopic,
 		svc,
-		client.NewClient(aggregatorEndpoint),
+		client.NewHTTPClient(aggregatorEndpoint),
 	)
 	if err != nil {
 		logrus.Fatal(err)
