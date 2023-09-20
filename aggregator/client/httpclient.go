@@ -20,7 +20,10 @@ func NewHTTPClient(endpoint string) *HTTPClient {
 	}
 }
 
-func (c *HTTPClient) Aggregate(ctx context.Context, aggReq *types.AggregateRequest) error {
+func (c *HTTPClient) Aggregate(
+	ctx context.Context,
+	aggReq *types.AggregateRequest,
+) error {
 	b, err := json.Marshal(aggReq)
 	if err != nil {
 		return err
@@ -41,5 +44,40 @@ func (c *HTTPClient) Aggregate(ctx context.Context, aggReq *types.AggregateReque
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("unexpected status code: %v", resp.StatusCode)
 	}
+	defer resp.Body.Close()
+
 	return nil
+}
+
+func (c *HTTPClient) GetInvoice(ctx context.Context, obuID int) (*types.Invoice, error) {
+	invReq := types.GetInvoiceRequest{
+		ObuId: int32(obuID),
+	}
+	b, err := json.Marshal(&invReq)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest(
+		http.MethodPost,
+		c.Endpoint+"/invoice",
+		bytes.NewReader(b),
+	)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %v", resp.StatusCode)
+	}
+	var inv types.Invoice
+	if err := json.NewDecoder(resp.Body).Decode(&inv); err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	return &inv, nil
 }

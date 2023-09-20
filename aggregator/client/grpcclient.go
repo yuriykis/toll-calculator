@@ -5,7 +5,6 @@ import (
 
 	"github.com/yuriykis/tolling/types"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 type GRPCClient struct {
@@ -14,9 +13,13 @@ type GRPCClient struct {
 }
 
 func NewGRPCClient(endpoint string) (*GRPCClient, error) {
+	// conn, err := grpc.Dial(
+	// 	endpoint,
+	// 	grpc.WithTransportCredentials(insecure.NewCredentials()),
+	// )
 	conn, err := grpc.Dial(
 		endpoint,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithInsecure(),
 	)
 	if err != nil {
 		return nil, err
@@ -31,4 +34,9 @@ func NewGRPCClient(endpoint string) (*GRPCClient, error) {
 func (c GRPCClient) Aggregate(ctx context.Context, aggReq *types.AggregateRequest) error {
 	_, err := c.client.Aggregate(ctx, aggReq)
 	return err
+}
+
+func (c GRPCClient) GetInvoice(ctx context.Context, obuID int) (*types.Invoice, error) {
+	// not implemented
+	return nil, nil
 }

@@ -17,11 +17,22 @@ func NewGRPCAggregatorServer(svc Aggregator) *GRPCAggregatorServer {
 	}
 }
 
-func (s *GRPCAggregatorServer) Aggregate(ctx context.Context, req *types.AggregateRequest) (*types.None, error) {
+func (s *GRPCAggregatorServer) Aggregate(
+	ctx context.Context,
+	req *types.AggregateRequest,
+) (*types.None, error) {
 	dist := types.Distance{
 		OBUID: int(req.ObuId),
 		Value: req.Value,
 		Unix:  req.Unix,
 	}
 	return &types.None{}, s.svc.AggregateDistance(dist)
+}
+
+func (s *GRPCAggregatorServer) GetInvoice(
+	ctx context.Context,
+	req *types.GetInvoiceRequest,
+) (*types.Invoice, error) {
+	// not implemented
+	return nil, nil
 }

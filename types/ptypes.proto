@@ -10,6 +10,10 @@ message None {
 
 }
 
+message GetInvoiceRequest {
+  int32 obu_id = 1;
+}
+
 message AggregateRequest {
   int32 obu_id = 1;
   double value = 2;
