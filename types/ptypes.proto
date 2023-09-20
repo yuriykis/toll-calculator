@@ -3,15 +3,17 @@ syntax = "proto3";
 option go_package = "github.com/yuriykis/tolling/types";
 
 service Aggregator {
-    rpc Aggregate(AggregateRequest) returns (None);
+  rpc Aggregate(AggregateRequest) returns (None);
 }
 
-message None {}
+message None {
+
+}
 
 message AggregateRequest {
-    int32 ObuID = 1;
-    double Value = 2;
-    int64 Unix = 3;
+  int32 obu_id = 1;
+  double value = 2;
+  int64 unix = 3;
 }
 
  

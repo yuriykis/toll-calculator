@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -11,7 +10,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/yuriykis/tolling/aggregator/client"
 	"github.com/yuriykis/tolling/types"
 	"google.golang.org/grpc"
 )
@@ -32,18 +30,19 @@ func main() {
 	}()
 
 	time.Sleep(time.Second)
-	c, err := client.NewGRPCClient(*grpcListenAddr)
-	if err != nil {
-		log.Fatal(err)
 
-	}
-	if _, err := c.Aggregate(context.Background(), &types.AggregateRequest{
-		ObuID: 1,
-		Value: 58.44,
-		Unix:  time.Now().Unix(),
-	}); err != nil {
-		log.Fatal(err)
-	}
+	// c, err := client.NewGRPCClient(*grpcListenAddr)
+	// if err != nil {
+	// 	log.Fatal(err)
+
+	// }
+	// if err := c.Aggregate(context.Background(), &types.AggregateRequest{
+	// 	ObuId: 1,
+	// 	Value: 58.44,
+	// 	Unix:  time.Now().Unix(),
+	// }); err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	log.Fatal(makeHTTPTransport(*httpListenAddr, svc))
 }

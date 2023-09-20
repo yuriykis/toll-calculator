@@ -7,7 +7,7 @@ import (
 
 const (
 	kafkaTopic         = "obu-data"
-	aggregatorEndpoint = "http://localhost:3000"
+	aggregatorEndpoint = ":3000"
 )
 
 func main() {
@@ -18,10 +18,15 @@ func main() {
 	svc = NewCalculatorService()
 	svc = NewLogMiddleware(svc)
 
+	// httpClient := client.NewHTTPClient(aggregatorEndpoint)
+	grpcClient, err := client.NewGRPCClient(aggregatorEndpoint)
+	if err != nil {
+		logrus.Fatal(err)
+	}
 	kafkaConsumer, err := NewKafkaConsumer(
 		kafkaTopic,
 		svc,
-		client.NewHTTPClient(aggregatorEndpoint),
+		grpcClient,
 	)
 	if err != nil {
 		logrus.Fatal(err)

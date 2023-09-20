@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"time"
 
@@ -11,16 +12,16 @@ import (
 )
 
 type KafkaConsumer struct {
-	consumer      *kafka.Consumer
-	ifRunning     bool
-	calcService   CalculatorServicer
-	aggHTTPClient *client.HTTPClient
+	consumer    *kafka.Consumer
+	ifRunning   bool
+	calcService CalculatorServicer
+	aggClient   client.Client
 }
 
 func NewKafkaConsumer(
 	topic string,
 	svc CalculatorServicer,
-	aggHTTPClient *client.HTTPClient,
+	aggClient client.Client,
 ) (*KafkaConsumer, error) {
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers": "localhost",
@@ -34,9 +35,9 @@ func NewKafkaConsumer(
 	c.SubscribeTopics([]string{topic}, nil)
 
 	return &KafkaConsumer{
-		consumer:      c,
-		calcService:   svc,
-		aggHTTPClient: aggHTTPClient,
+		consumer:    c,
+		calcService: svc,
+		aggClient:   aggClient,
 	}, nil
 }
 
@@ -63,12 +64,12 @@ func (c *KafkaConsumer) readMessageLoop() {
 			logrus.Errorf("Error calculating distance: %v", err)
 			continue
 		}
-		req := types.Distance{
-			OBUID: data.OBUID,
+		req := &types.AggregateRequest{
+			ObuId: int32(data.OBUID),
 			Value: distance,
-			Unix:  time.Now().Unix(),
+			Unix:  time.Now().UnixNano(),
 		}
-		if err := c.aggHTTPClient.AggregateInvoice(req); err != nil {
+		if err := c.aggClient.Aggregate(context.Background(), req); err != nil {
 			logrus.Errorf("Error aggregating invoice: %v", err)
 			continue
 		}
