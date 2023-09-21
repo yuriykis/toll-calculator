@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/sirupsen/logrus"
 	"github.com/yuriykis/tolling/types"
 )
 
@@ -51,15 +52,20 @@ func (c *HTTPClient) Aggregate(
 
 func (c *HTTPClient) GetInvoice(ctx context.Context, obuID int) (*types.Invoice, error) {
 	invReq := types.GetInvoiceRequest{
-		ObuId: int32(obuID),
+		ObuId: int64(obuID),
 	}
 	b, err := json.Marshal(&invReq)
 	if err != nil {
 		return nil, err
 	}
+	endpoint := fmt.Sprintf("%s/%s?obu=%d", c.Endpoint, "invoice", obuID)
+	logrus.Infof("requesting invoice from %s", endpoint)
+	if err != nil {
+		return nil, err
+	}
 	req, err := http.NewRequest(
 		http.MethodPost,
-		c.Endpoint+"/invoice",
+		endpoint,
 		bytes.NewReader(b),
 	)
 	if err != nil {

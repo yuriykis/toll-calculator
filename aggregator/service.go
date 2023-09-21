@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/sirupsen/logrus"
 	"github.com/yuriykis/tolling/types"
 )
 
@@ -24,6 +25,11 @@ func NewInvoiceAggregator(store Storer) Aggregator {
 
 func (ia *InvoiceAggregator) AggregateDistance(distance types.Distance) error {
 	fmt.Printf("Aggregating and inserting distance %v\n", distance)
+	logrus.WithFields(logrus.Fields{
+		"obu_id": distance.OBUID,
+		"value":  distance.Value,
+		"unix":   distance.Unix,
+	}).Info("Aggregating and inserting distance")
 	return ia.store.Insert(distance)
 }
 

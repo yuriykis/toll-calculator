@@ -65,7 +65,7 @@ func (c *KafkaConsumer) readMessageLoop() {
 			continue
 		}
 		req := &types.AggregateRequest{
-			ObuId: int32(data.OBUID),
+			ObuId: int64(data.OBUID),
 			Value: distance,
 			Unix:  time.Now().UnixNano(),
 		}
