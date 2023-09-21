@@ -7,7 +7,7 @@ import (
 
 const (
 	kafkaTopic         = "obu-data"
-	aggregatorEndpoint = "127.0.0.1:3000"
+	aggregatorEndpoint = ":3001"
 )
 
 func main() {

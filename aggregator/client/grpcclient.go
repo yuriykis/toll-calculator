@@ -5,6 +5,7 @@ import (
 
 	"github.com/yuriykis/tolling/types"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type GRPCClient struct {
@@ -19,7 +20,7 @@ func NewGRPCClient(endpoint string) (*GRPCClient, error) {
 	// )
 	conn, err := grpc.Dial(
 		endpoint,
-		grpc.WithInsecure(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
 		return nil, err
