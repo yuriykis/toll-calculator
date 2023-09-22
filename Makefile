@@ -3,6 +3,7 @@ RECEIVER_BINARY_NAME=receiver
 CALCULATOR_BINARY_NAME=calculator
 AGGREAGTOR_BINARY_NAME=agg
 GATE_BINARY_NAME=gate
+
 obu:
 	@go build -o bin/$(OBU_BINARY_NAME) obu/main.go
 	@./bin/$(OBU_BINARY_NAME)
@@ -27,5 +28,11 @@ proto:
 gate:
 	@go build -o bin/$(GATE_BINARY_NAME) ./gateway
 	@./bin/$(GATE_BINARY_NAME)
+
+prom:
+	@docker run -d --net="host" -p 9090:9090 -v ./.config/prometheus.yml:/etc/prometheus/prometheus.yml:z prom/prometheus
+	
+prom-restart:
+	@docker restart $(shell docker ps -q --filter ancestor=prom/prometheus)
 
 .PHONY: obu agg
