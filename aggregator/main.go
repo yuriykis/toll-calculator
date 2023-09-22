@@ -81,10 +81,21 @@ func makeHTTPTransport(listenAddr string, svc Aggregator) error {
 	var (
 		aggMetricsHandler = newHTTPMetricHandler("aggregate")
 		invMetricsHandler = newHTTPMetricHandler("invoice")
+		aggHandler        = makeHTTPHandlerFunc(
+			invMetricsHandler.instrument(handleAggregate(svc)),
+		)
+		invHandler = makeHTTPHandlerFunc(
+			aggMetricsHandler.instrument(handleGetInvoice(svc)),
+		)
 	)
-
-	http.HandleFunc("/aggregate", aggMetricsHandler.instrument(handleAggregate(svc)))
-	http.HandleFunc("/invoice", invMetricsHandler.instrument(handleGetInvoice(svc)))
+	http.HandleFunc(
+		"/invoice",
+		invHandler,
+	)
+	http.HandleFunc(
+		"/aggregate",
+		aggHandler,
+	)
 	http.HandleFunc("/metrics", promhttp.Handler().ServeHTTP)
 
 	fmt.Println("Starting HTTP transport")
