@@ -30,9 +30,18 @@ gate:
 	@./bin/$(GATE_BINARY_NAME)
 
 prom:
-	@docker run -d --net="host" -p 9090:9090 -v ./.config/prometheus.yml:/etc/prometheus/prometheus.yml:z prom/prometheus
+	@docker run -d -p 9094:9090 -v ./.config/prometheus.yml:/etc/prometheus/prometheus.yml:z prom/prometheus
 	
 prom-restart:
 	@docker restart $(shell docker ps -q --filter ancestor=prom/prometheus)
+
+prom-stop:
+	@docker stop $(shell docker ps -q --filter ancestor=prom/prometheus)
+
+prom-delete:
+	@docker rm -f $(shell docker ps -qa --filter ancestor=prom/prometheus)
+
+grafana:
+	@docker run -d -p 3000:3000 --name=grafana grafana/grafana-enterprise
 
 .PHONY: obu agg

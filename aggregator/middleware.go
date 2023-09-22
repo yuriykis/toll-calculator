@@ -110,7 +110,9 @@ func (mm *MetricsMiddleware) AggregateDistance(d types.Distance) (err error) {
 	return
 }
 
-func (mm *MetricsMiddleware) CalculateInvoice(obuID int) (invoice *types.Invoice, err error) {
+func (mm *MetricsMiddleware) CalculateInvoice(
+	obuID int,
+) (invoice *types.Invoice, err error) {
 	defer func(start time.Time) {
 		mm.reqLatencyCalculate.Observe(time.Since(start).Seconds())
 		mm.reqCounterCalculate.Inc()
