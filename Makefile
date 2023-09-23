@@ -2,6 +2,7 @@ OBU_BINARY_NAME=obu
 RECEIVER_BINARY_NAME=receiver
 CALCULATOR_BINARY_NAME=calculator
 AGGREAGTOR_BINARY_NAME=agg
+AGGREAGTOR_GO_KIT_BINARY_NAME=agg_go_kit
 GATE_BINARY_NAME=gate
 
 obu:
@@ -19,6 +20,10 @@ calculator:
 agg:
 	@go build -o bin/$(AGGREAGTOR_BINARY_NAME) ./aggregator
 	@./bin/$(AGGREAGTOR_BINARY_NAME)
+
+agg-go-kit:
+	@go build -o bin/$(AGGREAGTOR_GO_KIT_BINARY_NAME) ./go-kit-example/aggsvc/cmd
+	@./bin/$(AGGREAGTOR_GO_KIT_BINARY_NAME)
 
 proto:
 	protoc --go_out=. --go_opt=paths=source_relative \

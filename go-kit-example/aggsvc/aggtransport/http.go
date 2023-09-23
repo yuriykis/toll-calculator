@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -113,7 +113,7 @@ func encodeHTTPGenericRequest(
 	if err := json.NewEncoder(&buf).Encode(request); err != nil {
 		return err
 	}
-	r.Body = ioutil.NopCloser(&buf)
+	r.Body = io.NopCloser(&buf)
 	return nil
 }
 

@@ -14,7 +14,7 @@ import (
 func main() {
 	var (
 		logger      = log.NewLogfmtLogger(os.Stderr)
-		service     = aggservice.New()
+		service     = aggservice.New(logger)
 		endpoints   = aggendpoint.New(service, logger)
 		httpHandler = aggtransport.NewHTTPHandler(endpoints, logger)
 	)
@@ -28,9 +28,9 @@ func main() {
 		logger.Log("transport", "HTTP", "during", "Listen", "err", err)
 		os.Exit(1)
 	}
+	logger.Log("transport", "HTTP", "during", "Serve", "err", err)
 	err = http.Serve(httpListener, httpHandler)
 	if err != nil {
-		logger.Log("transport", "HTTP", "during", "Serve", "err", err)
 		os.Exit(1)
 	}
 }

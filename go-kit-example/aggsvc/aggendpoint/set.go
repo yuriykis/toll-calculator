@@ -6,8 +6,10 @@ import (
 
 	"github.com/go-kit/kit/circuitbreaker"
 	"github.com/go-kit/kit/endpoint"
+	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/go-kit/kit/ratelimit"
 	log "github.com/go-kit/log"
+	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/sony/gobreaker"
 	"github.com/yuriykis/tolling/go-kit-example/aggsvc/aggservice"
 	"github.com/yuriykis/tolling/types"
@@ -20,6 +22,12 @@ type Set struct {
 }
 
 func New(svc aggservice.Service, logger log.Logger) Set {
+	duration := prometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
+		Namespace: "toll_calculator",
+		Name:      "request_duration_seconds",
+		Help:      "Time (in seconds) spent serving aggregate requests",
+	}, []string{"method", "success"})
+
 	var aggregateEndpoint endpoint.Endpoint
 	{
 		aggregateEndpoint = makeAggregateEndpoint(svc)
@@ -36,16 +44,16 @@ func New(svc aggservice.Service, logger log.Logger) Set {
 			aggregateEndpoint,
 		)
 
-		// aggregateEndpoint = LoggingMiddleware(
-		// 	log.With(logger, "method", "Sum"),
-		// )(
-		// 	aggregateEndpoint,
-		// )
-		// aggregateEndpoint = InstrumentingMiddleware(
-		// 	duration.With("method", "Sum"),
-		// )(
-		// 	aggregateEndpoint,
-		// )
+		aggregateEndpoint = LoggingMiddleware(
+			log.With(logger, "method", "aggregate"),
+		)(
+			aggregateEndpoint,
+		)
+		aggregateEndpoint = InstrumentingMiddleware(
+			duration.With("method", "aggregate"),
+		)(
+			aggregateEndpoint,
+		)
 	}
 	var calculateEndpoint endpoint.Endpoint
 	{
@@ -62,16 +70,16 @@ func New(svc aggservice.Service, logger log.Logger) Set {
 		)(
 			calculateEndpoint,
 		)
-		// calculateEndpoint = LoggingMiddleware(
-		// 	log.With(logger, "method", "Concat"),
-		// )(
-		// 	calculateEndpoint,
-		// )
-		// calculateEndpoint = InstrumentingMiddleware(
-		// 	duration.With("method", "Concat"),
-		// )(
-		// 	calculateEndpoint,
-		// )
+		calculateEndpoint = LoggingMiddleware(
+			log.With(logger, "method", "invoice"),
+		)(
+			calculateEndpoint,
+		)
+		calculateEndpoint = InstrumentingMiddleware(
+			duration.With("method", "invoice"),
+		)(
+			calculateEndpoint,
+		)
 	}
 	return Set{
 		AggregateEndpoint: aggregateEndpoint,
