@@ -41,6 +41,13 @@ func NewKafkaConsumer(
 	}, nil
 }
 
+func (c *KafkaConsumer) Stop() {
+	logrus.Info("Stopping Kafka consumer")
+	c.ifRunning = false
+	time.Sleep(time.Second)
+	c.consumer.Close()
+}
+
 func (c *KafkaConsumer) Start() {
 	logrus.Info("Starting Kafka consumer")
 	c.ifRunning = true
@@ -57,6 +64,10 @@ func (c *KafkaConsumer) readMessageLoop() {
 		var data types.OBUData
 		if err := json.Unmarshal(msg.Value, &data); err != nil {
 			logrus.Errorf("Error unmarshalling message: %v", err)
+			logrus.WithFields(logrus.Fields{
+				"error":    err,
+				"reqestID": data.RequestID,
+			})
 			continue
 		}
 		distance, err := c.calcService.CalculateDistance(data)

@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
+	"math/rand"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -68,6 +70,7 @@ func (dr *DataReceiver) wsReceiveLoop() {
 			log.Println(err)
 			continue
 		}
+		data.RequestID = rand.Intn(math.MaxInt)
 		if err := dr.produceData(data); err != nil {
 			log.Println(err)
 		}
